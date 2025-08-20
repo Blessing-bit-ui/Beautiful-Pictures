@@ -10,10 +10,12 @@ export default function App(){
   const [selected, setSelected] = useState(null)
   const [viewed, setViewed] = useState([])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
   useEffect(function(){
     async function fetchImages(){ 
       if(!query) return;
+      try{
       setLoading(true)
       const res = await fetch(
         `https://api.pexels.com/v1/search?query=${query}&per_page=10`,
@@ -23,11 +25,19 @@ export default function App(){
       }
     }
   )
+  if(!res.ok)
+    throw new Error("Something went wrong");
   const data= await res.json()
       console.log(data.photos)
-      setImages(data.photos)
+      setImages(data.photos) // will come here later
+    }catch(err){
+      console.error(err.message)
+      setError(err.message)
     }
-    setLoading(false)
+    finally{
+       setLoading(false);
+    }
+  }
     fetchImages()
   }, [query])
 
@@ -45,7 +55,7 @@ export default function App(){
       <Form query={query} setQuery={setQuery} images={images} />
       <div className="flex w-11/12">
      
-     {loading && <Loading />  }
+     {loading ? <Loading />  :
     <div className="w-full sm:w-8/12 md:w-6/12">
         <Images
           images={images}
@@ -53,8 +63,8 @@ export default function App(){
           ondisplayDetails={displayDetails}
         />
         </div>
-
-
+}
+  <Error message={message}/>
         <ImagesViewed
           onViewImages={handleViewImages}
           viewed={viewed}
@@ -68,6 +78,12 @@ export default function App(){
         />
     </div>
   );
+}
+
+function Error({message}){
+  return(
+    <p>{message.code}</p>
+  )
 }
 
 function Loading(){
