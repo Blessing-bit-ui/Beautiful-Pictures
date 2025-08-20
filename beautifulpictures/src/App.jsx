@@ -9,6 +9,7 @@ export default function App(){
   const [query, setQuery] = useState("")
   const [images, setImages] =useState([])
   const [selected, setSelected] = useState(null)
+  const [viewed, setViewed] = useState([])
 
   useEffect(function(){
     async function fetchImages(){
@@ -31,17 +32,32 @@ export default function App(){
    function displayDetails(id){
     setSelected(id)
    }
+
+   function handleViewImages(image){
+    setViewed((viewed)=>[
+      ...viewed, image
+    ])
+   }
   return (
     <div className="w-11/12">
       <Form query={query} setQuery={setQuery} images={images} />
       <div className="flex">
-      <Images
-        images={images}
-        setImages={setImages}
-        ondisplayDetails={displayDetails}
-      />
-      <ImageDetails selected={selected} setSelected={setSelected} />
-    </div>
+        <Images
+          images={images}
+          setImages={setImages}
+          ondisplayDetails={displayDetails}
+        />
+        <ImagesViewed
+          onViewImages={handleViewImages}
+          viewed={viewed}
+          setViewed={setViewed}
+        />
+        </div>
+        <ImageDetails
+          selected={selected}
+          setSelected={setSelected}
+          onViewImages={handleViewImages}
+        />
     </div>
   );
 }
@@ -72,14 +88,14 @@ function Images({images,setImages, ondisplayDetails}){
   )
 }
 
-function Image({image, ondisplayDetails}){
+function Image({image, ondisplayDetails,}){
   return (
     <div
       onClick={() => ondisplayDetails(image.id)}
       className="w-[250px] flex gap-4 shadow-lg h-[100px] ml-2"
     >
       <img
-        src={image.src.tiny}
+        src={image.src.original}
         alt={image.alt}
         className="w-[50px] border rounded-lg"
       />
@@ -87,10 +103,10 @@ function Image({image, ondisplayDetails}){
     </div>
   );
 }
-
-function ImageDetails({selected, setSelected}){
-const [image, setImage] = useState({})
  
+function ImageDetails({selected, setSelected, onViewImages}){
+const [image, setImage] = useState({})
+
   useEffect(function(){
     async function displayDetails(){
      const res = await fetch(`https://api.pexels.com/v1/photos/${selected}`,
@@ -106,11 +122,35 @@ const [image, setImage] = useState({})
     }
     displayDetails() 
   }, [selected])
+
+  function handleAddList(){
+    const viewList={
+      photographer:image.photographer,
+      alt:image.alt
+    }
+    onViewImages(viewList)
+  }
+
   return(
     <div>
-    <img src={image.src.original} />  
   <p>{image.photographer}</p>
-{selected && <a href={image.photographer_url}>Photographer Profile</a>}
+  {selected &&
+    <>
+ <a href={image.photographer_url}>Photographer Profile</a>
+    <button onClick={handleAddList}>Add to List</button>
+    </>
+  }
     </div>
+
   )
+}
+function ImagesViewed({viewed, setViewed}){
+
+return(
+  <div>
+    {viewed.map((view)=>(
+      <p>{view.photographer}</p>
+    ))}
+  </div>
+)
 }
