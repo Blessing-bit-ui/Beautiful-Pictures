@@ -4,16 +4,17 @@ import viteLogo from '/vite.svg'
 import './App.css'
 
 const Key = "MfcgBp0ax9DY23ItLMgQOHpKXUhbbGrcyPlIeNdHVzTqgZhrfPz11Z9P";
-
 export default function App(){
   const [query, setQuery] = useState("")
   const [images, setImages] =useState([])
   const [selected, setSelected] = useState(null)
   const [viewed, setViewed] = useState([])
+  const [loading, setLoading] = useState(false)
 
   useEffect(function(){
-    async function fetchImages(){
+    async function fetchImages(){ 
       if(!query) return;
+      setLoading(true)
       const res = await fetch(
         `https://api.pexels.com/v1/search?query=${query}&per_page=10`,
         {
@@ -26,7 +27,8 @@ export default function App(){
       console.log(data.photos)
       setImages(data.photos)
     }
-    if(query) fetchImages()
+    setLoading(false)
+    fetchImages()
   }, [query])
 
    function displayDetails(id){
@@ -41,12 +43,18 @@ export default function App(){
   return (
     <div className="w-11/12">
       <Form query={query} setQuery={setQuery} images={images} />
-      <div className="flex">
+      <div className="flex w-11/12">
+     
+     {loading && <Loading />  }
+    <div className="w-full sm:w-8/12 md:w-6/12">
         <Images
           images={images}
           setImages={setImages}
           ondisplayDetails={displayDetails}
         />
+        </div>
+
+
         <ImagesViewed
           onViewImages={handleViewImages}
           viewed={viewed}
@@ -62,6 +70,13 @@ export default function App(){
   );
 }
 
+function Loading(){
+  return(
+    <div>
+      <p>...Loading</p>
+    </div>
+  )
+}
 function Form({query, setQuery, images}){
   return (
     <div className="bg-purple-700 p-3 mr-2 ml-2 border rounded-lg">
@@ -92,7 +107,7 @@ function Image({image, ondisplayDetails,}){
   return (
     <div
       onClick={() => ondisplayDetails(image.id)}
-      className="w-[250px] flex gap-4 shadow-lg h-[100px] ml-2"
+      className="flex gap-4 shadow-lg h-[100px] ml-2"
     >
       <img
         src={image.src.original}
@@ -141,11 +156,9 @@ const [image, setImage] = useState({})
     </>
   }
     </div>
-
   )
 }
 function ImagesViewed({viewed, setViewed}){
-
 return(
   <div>
     {viewed.map((view)=>(
