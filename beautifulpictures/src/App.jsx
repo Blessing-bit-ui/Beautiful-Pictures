@@ -4,6 +4,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 
 const Key = "MfcgBp0ax9DY23ItLMgQOHpKXUhbbGrcyPlIeNdHVzTqgZhrfPz11Z9P";
+
 export default function App(){
   const [query, setQuery] = useState("")
   const [images, setImages] =useState([])
@@ -26,17 +27,18 @@ export default function App(){
     }
   )
   if(!res.ok)
-    throw new Error("Something went wrong");
+    throw new Error ("Something went wrong") // this is not realy needed
   const data= await res.json()
-      console.log(data.photos)
+  if(data.total_results = "0")throw new Error("Photo not found");
+        console.log(data.photos)
       setImages(data.photos) // will come here later
-    }catch(err){
-      console.error(err.message)
-      setError(err.message)
-    }
-    finally{
-       setLoading(false);
-    }
+       setLoading(false)
+}catch(err){
+  console.log(err.message);
+  setError(err.message)
+} finally{
+  setLoading(false)
+}
   }
     fetchImages()
   }, [query])
@@ -44,7 +46,6 @@ export default function App(){
    function displayDetails(id){
     setSelected(id)
    }
-
    function handleViewImages(image){
     setViewed((viewed)=>[
       ...viewed, image
@@ -54,35 +55,35 @@ export default function App(){
     <div className="w-11/12">
       <Form query={query} setQuery={setQuery} images={images} />
       <div className="flex w-11/12">
-     
-     {loading ? <Loading />  :
-    <div className="w-full sm:w-8/12 md:w-6/12">
-        <Images
-          images={images}
-          setImages={setImages}
-          ondisplayDetails={displayDetails}
-        />
-        </div>
-}
-  <Error message={message}/>
+      {loading && <Loading/>}
+        {loading && !error && (
+          <div className="w-full sm:w-8/12 md:w-6/12">
+            <Images
+              images={images}
+              setImages={setImages}
+              ondisplayDetails={displayDetails}
+            />
+          </div>
+        )}
+        {error && <ErrorMessage message={error} />}
         <ImagesViewed
           onViewImages={handleViewImages}
           viewed={viewed}
           setViewed={setViewed}
         />
-        </div>
-        <ImageDetails
-          selected={selected}
-          setSelected={setSelected}
-          onViewImages={handleViewImages}
-        />
+      </div>
+      <ImageDetails
+        selected={selected}
+        setSelected={setSelected}
+        onViewImages={handleViewImages}
+      />
     </div>
   );
 }
 
-function Error({message}){
+function ErrorMessage({message}){
   return(
-    <p>{message.code}</p>
+    <p>{message}</p>
   )
 }
 
