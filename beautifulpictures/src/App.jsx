@@ -134,11 +134,11 @@ function Image({image, ondisplayDetails,}){
 function ImageDetails({selected, setSelected, onViewImages}){
 const [image, setImage] = useState({})
 const [rating, setRating] = useState(0)
-const [temp, setTemp] = useState(3)
+const [temp, setTemp] = useState(0)
 
 
 function handleRating(rate) {
-  setRating(rate);
+  setRating(rate)
 }
 
   useEffect(function(){
@@ -165,28 +165,33 @@ function handleRating(rate) {
     onViewImages(viewList)
   }
 
-  return(
+  return (
     <div>
-  <p>{image.photographer}</p>
-  {selected &&
-    <>
- <a href={image.photographer_url}>Photographer Profile</a>
-    <button onClick={handleAddList}>Add to List</button>
-    </>
-  }
-{ Array.from({length: 5}, (_,i)=>(
-  <div className='w-[10px]'>
-  <StarRating
-  key={i}
-  full={temp ? temp >= i+1 : rating >= 1 + i}
-  onRating={()=>handleRating(i + 1)}
-  onHoverEnter={()=>setTemp(i+1)}
-  onHoverLeave={()=>setTemp(0)}
-  />
-  </div>
-))}
+      <p>{image.photographer}</p>
+      {selected && (
+        <>
+          <a href={image.photographer_url}>Photographer Profile</a>
+          <button onClick={handleAddList}>Add to List</button>
+        </>
+      )}
+      {selected && (
+        <div className="w-fit flex flex- space-y-2">
+          {Array.from({ length: 5 }, (_, i) => (
+            <StarRating
+              key={i}
+              full={temp ? temp >= i + 1 : rating >= 1 + i}
+              onRating={() => handleRating(i + 1)}
+              onHoverEnter={() => setTemp(i + 1)}
+              onHoverLeave={() => setTemp(0)}
+              temp={temp}
+              rating={rating}
+            />
+          ))}
+          <p className="text-lg">{temp || rating || ""}</p>
+        </div>
+      )}
     </div>
-  )
+  );
 }
 function ImagesViewed({viewed, setViewed}){
 return(
@@ -197,9 +202,9 @@ return(
   </div>
 )
 }
- function StarRating({full, onRating, onHoverEnter, onHoverLeave}){
+ function StarRating({full, onRating, onHoverEnter, onHoverLeave, rating, temp}){
   return (
-    <span className='w-[10px]'
+    <span className='w-[30px] '
     onMouseEnter={onHoverEnter}
     onMouseLeave={onHoverLeave}
     onClick={onRating}
@@ -219,7 +224,6 @@ return(
         fill="none"
         viewBox="0 0 24 24"
         stroke="red"
-        onClick={onRating}
       >
         <path
           strokeLinecap="round"
@@ -229,6 +233,7 @@ return(
         />
       </svg>
       )}
+    
     </span>
   );
  }
