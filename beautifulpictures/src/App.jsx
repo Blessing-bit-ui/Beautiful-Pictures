@@ -133,6 +133,13 @@ function Image({image, ondisplayDetails,}){
 }
 function ImageDetails({selected, setSelected, onViewImages}){
 const [image, setImage] = useState({})
+const [rating, setRating] = useState(0)
+const [temp, setTemp] = useState(3)
+
+
+function handleRating(rate) {
+  setRating(rate);
+}
 
   useEffect(function(){
     async function displayDetails(){
@@ -167,8 +174,16 @@ const [image, setImage] = useState({})
     <button onClick={handleAddList}>Add to List</button>
     </>
   }
-{selected &&  Array.from({length: 5}, (_,i)=>(
-  <StarRating/>
+{ Array.from({length: 5}, (_,i)=>(
+  <div className='w-[10px]'>
+  <StarRating
+  key={i}
+  full={temp ? temp >= i+1 : rating >= 1 + i}
+  onRating={()=>handleRating(i + 1)}
+  onHoverEnter={()=>setTemp(i+1)}
+  onHoverLeave={()=>setTemp(0)}
+  />
+  </div>
 ))}
     </div>
   )
@@ -182,15 +197,13 @@ return(
   </div>
 )
 }
- function StarRating(){
-  const [rating, setRating] = useState(0)
-  const full = rating >= 1 + i;
-    
-  function handleRating(){
-    setRating((prev)=> prev + 1)
-  }
+ function StarRating({full, onRating, onHoverEnter, onHoverLeave}){
   return (
-    <div className='w-[10px]'>
+    <span className='w-[10px]'
+    onMouseEnter={onHoverEnter}
+    onMouseLeave={onHoverLeave}
+    onClick={onRating}
+    >
       {full ? (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -206,7 +219,7 @@ return(
         fill="none"
         viewBox="0 0 24 24"
         stroke="red"
-        onClick={handleRating}
+        onClick={onRating}
       >
         <path
           strokeLinecap="round"
@@ -216,6 +229,6 @@ return(
         />
       </svg>
       )}
-    </div>
+    </span>
   );
  }
