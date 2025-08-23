@@ -51,23 +51,33 @@ export default function App(){
     ])
    }
   return (
-    <div className="w-11/12">
+    <div className="w-12/12">
       <Form query={query} setQuery={setQuery} images={images} />
-      <div className="flex w-11/12">
-      {loading && <Loading/>}
-          <div className="w-full sm:w-8/12 md:w-6/12">
-            <Images
-              images={images}
-              setImages={setImages}
-              ondisplayDetails={displayDetails}
-            />
-          </div>
-        {error && <ErrorMessage message={error}  />}
-        <ImagesViewed
-          onViewImages={handleViewImages}
-          viewed={viewed}
-          setViewed={setViewed}
-        />
+      <div className="flex w-10/12 mr-auto ml-auto">
+        {loading && <Loading />}
+        <div className="bg-blue-500 border rounded-lg w-1/2 mt-2 ml-3">
+          <Open
+            element={
+              <Images
+                images={images}
+                setImages={setImages}
+                ondisplayDetails={displayDetails}
+              />
+            }
+          />
+        </div>
+        {error && <ErrorMessage message={error} />}
+        <div className="bg-blue-500 border rounded-lg w-1/2 mt-2 ml-3">
+          <Open2
+            element2={
+              <ImagesViewed
+                onViewImages={handleViewImages}
+                viewed={viewed}
+                setViewed={setViewed}
+              />
+            }
+          />
+        </div>
       </div>
       <ImageDetails
         selected={selected}
@@ -90,6 +100,31 @@ function Loading(){
     </div>
   )
 }
+
+ function Open({element}){
+  const [open, setOpen] = useState(true)
+  function handleOpen(){
+    setOpen((open)=> open === true ? false : true)
+  }
+  return(
+    <div>
+     <button onClick={handleOpen}>{open ? "-" : "+"}</button>
+     {open && element}
+    </div>
+  )
+ }
+ function Open2({element2}){
+  const [open, setOpen] = useState(true)
+  function handleOpen(){
+    setOpen((open)=> open === true ? false : true)
+  }
+  return (
+    <div>
+      <button onClick={handleOpen}>{open ? "-" : "+"}</button>
+      {open && element2}
+    </div>
+  );
+ }
 function Form({query, setQuery, images}){
   return (
     <div className="bg-purple-700 p-3 mr-2 ml-2 border rounded-lg">
@@ -120,7 +155,7 @@ function Image({image, ondisplayDetails,}){
   return (
     <div
       onClick={() => ondisplayDetails(image.id)}
-      className="flex gap-4 shadow-lg h-[100px] ml-2"
+      className="flex gap-4 border mb-2 mr-2 rounded-lg shadow-lg h-[100px] ml-2 bg-white "
     >
       <img
         src={image.src.original}
