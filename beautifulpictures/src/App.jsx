@@ -72,6 +72,14 @@ export default function App(){
         </div>
         {error && <ErrorMessage message={error} />}
         <div className="border rounded-lg w-1/2 mt-2 ml-3">
+        {selected ?(
+           <ImageDetails
+        selected={selected}
+        setSelected={setSelected}
+        onViewImages={handleViewImages}
+        viewed={viewed}
+      />
+        ):(
           <Open2
             element2={
               <ImagesViewed
@@ -80,18 +88,11 @@ export default function App(){
                 setViewed={setViewed}
               />
             }
-          />
-        </div>
+          />)}
       </div>
-      <ImageDetails
-        selected={selected}
-        setSelected={setSelected}
-        onViewImages={handleViewImages}
-        viewed={viewed}
-  
-      />
     </div>
-  );
+    </div>
+  )
 }
 function ErrorMessage({message}){
   return(
@@ -201,10 +202,11 @@ function handleRating(rate) {
 
   function handleAddList(){
     const viewList={
-      photographer:images.photographer,
+      url:images.photographer_url,
       alt:images.alt,
       tiny: images?.src?.tiny,
-      id:images.id
+      id:images.id,
+      photographer:images?.photographer
     }
     onViewImages(viewList)
     setSelected(null)
@@ -249,11 +251,27 @@ function handleRating(rate) {
 function ImagesViewed({viewed, setViewed}){
 return (
   <div>
-    <div className="bg-[#1e293b] border shadow-lg p-3 text-white rounded-lg">Images Seen and Rated : {viewed.length}</div>
+    <div className="bg-[#1e293b] border shadow-lg p-3 text-white rounded-lg">
+      Images Seen and Rated : {viewed.length}
+    </div>
     {viewed.map((view) => (
-      <div key={view.id}>
-        <p> Photographed : {view.photographer}</p>
-        <img src={view.tiny} />
+      <div key={view.id} className="mt-2 flex w-fit">
+        <img
+          src={view.tiny}
+          alt={view.alt}
+          className="w-7/12 border rounded-lg"
+        />
+        <span>
+          <p className='font-bold'>
+            Photographer:
+            <span>
+              <em>{view.photographer}</em>
+            </span>
+          </p>
+          <a href={view.url} className="text-blue-500 text-sm hover:underline">
+            Photographed Profile
+          </a>
+        </span>
       </div>
     ))}
   </div>
