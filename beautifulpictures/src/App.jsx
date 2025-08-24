@@ -148,7 +148,7 @@ function Form({query, setQuery, images}){
     </div>
   );
 }
-function Images({images,setImages, ondisplayDetails}){
+function Images({images, ondisplayDetails}){
   return(
     <div className='h-fit mt-2'>
 {images.map((image)=>(
@@ -177,11 +177,14 @@ function ImageDetails({selected, setSelected, onViewImages, viewed}){
 const [images, setImages] = useState({})
 const [rating, setRating] = useState(0)
 const [temp, setTemp] = useState(0)
+const [viewerRating, setViewerRating] =useState(rating)
 
-const alreadyViewed = viewed.find((view) => view.id === selected);
+const alreadyViewed = viewed.find((view) => view.id === selected)
+const alreadyRated = images.find((image)=>image.id === selected)?.rating
 
 function handleRating(rate) {
   setRating(rate)
+  setViewerRating(rate)
 }
 
   useEffect(function(){
@@ -206,7 +209,8 @@ function handleRating(rate) {
       alt:images.alt,
       tiny: images?.src?.tiny,
       id:images.id,
-      photographer:images?.photographer
+      photographer:images?.photographer,
+      userRating: images.viewerRating
     }
     onViewImages(viewList)
     setSelected(null)
@@ -215,23 +219,22 @@ function handleRating(rate) {
   return (
     <div>
       <span>
-        <p>
-          <span className="font-bold">Photographer:</span> {images.photographer}
-        </p>
-        {selected && (
-          <>
-            <a href={images.photographer_url}>Photographer Profile</a>
-      {!alreadyViewed ? <button onClick={handleAddList}>Add to List</button> : <p>You already viewed this</p>}
-          </>
-        )}
-        <img
-          src={images?.src?.large}
-          className="w-[200px] border rounded-lg"
-        />
+        <img src={images?.src?.large} className="w-full border rounded-lg" />
+        <>
+          <p>
+            <span className="font-bold">Photographer:</span>{" "}
+            {images.photographer}
+          </p>
+          {!alreadyViewed ? (
+            <button onClick={handleAddList}>Add to List</button>
+          ) : (
+            <p>You already viewed this</p>
+          )}
+        </>
       </span>
       {selected && (
         <div className="w-fit flex flex- space-y-2">
-          {Array.from({ length: 5 }, (_, i) => (
+          { !alreadyViewed ? ( Array.from({ length: 5 }, (_, i) => (
             <StarRating
               key={i}
               full={temp ? temp >= i + 1 : rating >= 1 + i}
@@ -240,8 +243,13 @@ function handleRating(rate) {
               onHoverLeave={() => setTemp(0)}
               temp={temp}
               rating={rating}
+              viewerRating={viewerRating}
+              setViewerRating={setViewerRating}
             />
-          ))}
+          ))):(
+           <p> You rated this Pic {alreadyRated}</p>
+          )
+        }
           <p className="text-lg">{temp || rating || ""}</p>
         </div>
       )}
@@ -271,13 +279,14 @@ return (
           <a href={view.url} className="text-blue-500 text-sm hover:underline">
             Photographed Profile
           </a>
+          <p>{viewed.userRating}</p>
         </span>
       </div>
     ))}
   </div>
 );
 }
- function StarRating({full, onRating, onHoverEnter, onHoverLeave, rating, temp}){
+ function StarRating({full, onRating, onHoverEnter, viewerRating, onHoverLeave, rating, temp}){
   return (
     <span className='w-[30px] '
     onMouseEnter={onHoverEnter}
@@ -307,8 +316,7 @@ return (
           d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
         />
       </svg>
-      )}
-    
+      )}  
     </span>
   );
  }
