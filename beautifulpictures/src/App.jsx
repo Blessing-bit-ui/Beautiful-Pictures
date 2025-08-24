@@ -51,11 +51,11 @@ export default function App(){
     ])
    }
   return (
-    <div className="w-12/12">
+    <div className="w-12/12 bg-[#1e293b]">
       <Form query={query} setQuery={setQuery} images={images} />
       <div className="flex w-10/12 mr-auto ml-auto">
         {loading && <Loading />}
-        <div className="bg-blue-500 border rounded-lg w-1/2 mt-2 ml-3">
+        <div className="bg-[#1e293b] border rounded-lg w-1/2 mt-2 ml-3">
           <Open
             element={
               <Images
@@ -167,10 +167,9 @@ function Image({image, ondisplayDetails,}){
   );
 }
 function ImageDetails({selected, setSelected, onViewImages}){
-const [image, setImage] = useState({})
+const [images, setImages] = useState({})
 const [rating, setRating] = useState(0)
 const [temp, setTemp] = useState(0)
-
 
 function handleRating(rate) {
   setRating(rate)
@@ -187,28 +186,37 @@ function handleRating(rate) {
     )
      const data= await res.json()
      console.log(data)
-     setImage(data)
+     setImages(data)
     }
     displayDetails() 
   }, [selected])
 
   function handleAddList(){
     const viewList={
-      photographer:image.photographer,
-      alt:image.alt
+      photographer:images.photographer,
+      alt:images.alt,
+      original: images.src.original
     }
     onViewImages(viewList)
   }
 
   return (
     <div>
-      <p>{image.photographer}</p>
-      {selected && (
-        <>
-          <a href={image.photographer_url}>Photographer Profile</a>
-          <button onClick={handleAddList}>Add to List</button>
-        </>
-      )}
+      <span>
+        <p>
+          <span className="font-bold">Photographer:</span> {images.photographer}
+        </p>
+        {selected && (
+          <>
+            <a href={images.photographer_url}>Photographer Profile</a>
+            <button onClick={handleAddList}>Add to List</button>
+          </>
+        )}
+        <img
+          src={images?.src?.large}
+          className="w-[200px] border rounded-lg"
+        />
+      </span>
       {selected && (
         <div className="w-fit flex flex- space-y-2">
           {Array.from({ length: 5 }, (_, i) => (
@@ -232,7 +240,10 @@ function ImagesViewed({viewed, setViewed}){
 return(
   <div>
     {viewed.map((view)=>(
+      <div>
       <p>{view.photographer}</p>
+      
+      </div>
     ))}
   </div>
 )
