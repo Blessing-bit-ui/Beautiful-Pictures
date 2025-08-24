@@ -13,6 +13,8 @@ export default function App(){
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
+
+
   useEffect(function(){
     async function fetchImages(){ 
       if(query.length <= 2) return;
@@ -49,7 +51,9 @@ export default function App(){
     setViewed((viewed)=>[
       ...viewed, image
     ])
-   }
+    }
+
+   
   return (
     <div className="w-12/12 bg-[#1e293b]">
       <Form query={query} setQuery={setQuery} images={images} />
@@ -67,7 +71,7 @@ export default function App(){
           />
         </div>
         {error && <ErrorMessage message={error} />}
-        <div className="bg-blue-500 border rounded-lg w-1/2 mt-2 ml-3">
+        <div className="border rounded-lg w-1/2 mt-2 ml-3">
           <Open2
             element2={
               <ImagesViewed
@@ -83,6 +87,8 @@ export default function App(){
         selected={selected}
         setSelected={setSelected}
         onViewImages={handleViewImages}
+        viewed={viewed}
+  
       />
     </div>
   );
@@ -166,10 +172,12 @@ function Image({image, ondisplayDetails,}){
     </div>
   );
 }
-function ImageDetails({selected, setSelected, onViewImages}){
+function ImageDetails({selected, setSelected, onViewImages, viewed}){
 const [images, setImages] = useState({})
 const [rating, setRating] = useState(0)
 const [temp, setTemp] = useState(0)
+
+const alreadyViewed = viewed.find((view) => view.id === selected);
 
 function handleRating(rate) {
   setRating(rate)
@@ -195,9 +203,11 @@ function handleRating(rate) {
     const viewList={
       photographer:images.photographer,
       alt:images.alt,
-      original: images.src.original
+      tiny: images?.src?.tiny,
+      id:images.id
     }
     onViewImages(viewList)
+    setSelected(null)
   }
 
   return (
@@ -209,7 +219,7 @@ function handleRating(rate) {
         {selected && (
           <>
             <a href={images.photographer_url}>Photographer Profile</a>
-            <button onClick={handleAddList}>Add to List</button>
+      {!alreadyViewed ? <button onClick={handleAddList}>Add to List</button> : <p>You already viewed this</p>}
           </>
         )}
         <img
@@ -237,16 +247,17 @@ function handleRating(rate) {
   );
 }
 function ImagesViewed({viewed, setViewed}){
-return(
+return (
   <div>
-    {viewed.map((view)=>(
-      <div>
-      <p>{view.photographer}</p>
-      
+    <div className="bg-[#1e293b] border shadow-lg p-3 text-white rounded-lg">Images Seen and Rated : {viewed.length}</div>
+    {viewed.map((view) => (
+      <div key={view.id}>
+        <p> Photographed : {view.photographer}</p>
+        <img src={view.tiny} />
       </div>
     ))}
   </div>
-)
+);
 }
  function StarRating({full, onRating, onHoverEnter, onHoverLeave, rating, temp}){
   return (
