@@ -45,7 +45,7 @@ export default function App(){
   }, [query])
 
    function displayDetails(id){
-    setSelected(id)
+    setSelected((selected)=> selected === id ? null : id)
    }
    function handleViewImages(image){
     setViewed((viewed)=>[
@@ -177,15 +177,17 @@ function ImageDetails({selected, setSelected, onViewImages, viewed}){
 const [images, setImages] = useState({})
 const [rating, setRating] = useState(0)
 const [temp, setTemp] = useState(0)
-const [viewerRating, setViewerRating] =useState(rating)
+const [addToList, setAddToList] = useState(false)
+const [viewerRating, setViewerRating] =useState(0)
 
 const alreadyViewed = viewed.find((view) => view.id === selected)
-const alreadyRated = images.find((image)=>image.id === selected)?.rating
-
-function handleRating(rate) {
+const alreadyRated = viewed.find((view)=>view.id === selected)?.viewerRating
+function handleRating(rate){
   setRating(rate)
   setViewerRating(rate)
+  setAddToList(true)
 }
+
 
   useEffect(function(){
     async function displayDetails(){
@@ -210,7 +212,7 @@ function handleRating(rate) {
       tiny: images?.src?.tiny,
       id:images.id,
       photographer:images?.photographer,
-      userRating: images.viewerRating
+      viewerRating: viewerRating
     }
     onViewImages(viewList)
     setSelected(null)
@@ -225,11 +227,9 @@ function handleRating(rate) {
             <span className="font-bold">Photographer:</span>{" "}
             {images.photographer}
           </p>
-          {!alreadyViewed ? (
+          { addToList &&
             <button onClick={handleAddList}>Add to List</button>
-          ) : (
-            <p>You already viewed this</p>
-          )}
+               }
         </>
       </span>
       {selected && (
@@ -247,7 +247,7 @@ function handleRating(rate) {
               setViewerRating={setViewerRating}
             />
           ))):(
-           <p> You rated this Pic {alreadyRated}</p>
+           <p> You rated this Pic and rated this image {alreadyRated} </p>
           )
         }
           <p className="text-lg">{temp || rating || ""}</p>
@@ -256,7 +256,7 @@ function handleRating(rate) {
     </div>
   );
 }
-function ImagesViewed({viewed, setViewed}){
+function ImagesViewed({viewed, setViewed, viewerRating}){
 return (
   <div>
     <div className="bg-[#1e293b] border shadow-lg p-3 text-white rounded-lg">
@@ -279,14 +279,14 @@ return (
           <a href={view.url} className="text-blue-500 text-sm hover:underline">
             Photographed Profile
           </a>
-          <p>{viewed.userRating}</p>
+          <p>{viewerRating}</p>
         </span>
       </div>
     ))}
   </div>
 );
 }
- function StarRating({full, onRating, onHoverEnter, viewerRating, onHoverLeave, rating, temp}){
+ function StarRating({full, onRating, onHoverEnter, onHoverLeave}){
   return (
     <span className='w-[30px] '
     onMouseEnter={onHoverEnter}
