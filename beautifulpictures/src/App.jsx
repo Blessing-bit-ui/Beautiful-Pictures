@@ -13,9 +13,8 @@ export default function App(){
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
-
-
   useEffect(function(){
+    const controller= new AbortController()
     async function fetchImages(){ 
       if(query.length <= 2) return;
       try{
@@ -24,9 +23,11 @@ export default function App(){
         `https://api.pexels.com/v1/search?query=${query}&per_page=10`,
         {
       headers: {
-        Authorization: "MfcgBp0ax9DY23ItLMgQOHpKXUhbbGrcyPlIeNdHVzTqgZhrfPz11Z9P"
-      }
+        Authorization: Key
+      },
+      signal :controller.signal 
     }
+    
   )
   if(!res.ok)
   throw new Error ("Something went wrong") // this is not realy needed
@@ -35,15 +36,21 @@ export default function App(){
       setImages(data.photos) // will come here later
 }catch(err){
   console.log(err.message);
-  setError(err.message)
+  if(err.name !== "AbortError"){
+  setError(err.message)}
 } finally{
   setLoading(false)
 }
   }
 
     fetchImages()
+
+    return function(){
+      controller.abort();
+    }
   }, [query])
 
+  
    function displayDetails(id){
     setSelected((selected)=> selected === id ? null : id)
    }
@@ -52,7 +59,9 @@ export default function App(){
       ...viewed, image
     ])
     }
-
+//function deleteViewed(id) {
+  //setViewed(viewed.filter((view) => view.id !== id));
+//}
    
   return (
     <div className="w-12/12 bg-[#1e293b]">
@@ -182,6 +191,7 @@ const [viewerRating, setViewerRating] =useState(0)
 
 const alreadyViewed = viewed.find((view) => view.id === selected)
 const alreadyRated = viewed.find((view)=>view.id === selected)?.viewerRating
+
 function handleRating(rate){
   setRating(rate)
   setViewerRating(rate)
@@ -205,6 +215,8 @@ function handleRating(rate){
     displayDetails() 
   }, [selected])
 
+
+
   function handleAddList(){
     const viewList={
       url:images.photographer_url,
@@ -217,6 +229,18 @@ function handleRating(rate){
     onViewImages(viewList)
     setSelected(null)
   }
+
+useEffect(
+  function () {
+    if (!images?.alt) return;
+    document.title = `Image | ${images?.alt}`;
+    return function(){
+      document.title = "Splash Photos";
+    }
+  },
+  [images.alt]
+);
+
 
   return (
     <div>
@@ -256,7 +280,10 @@ function handleRating(rate){
     </div>
   );
 }
-function ImagesViewed({viewed, setViewed, viewerRating}){
+function ImagesViewed({viewed, setViewed}){
+  function deleteViewed(id) {
+    setViewed(viewed.filter((view) => view.id !== id));
+  }
 return (
   <div>
     <div className="bg-[#1e293b] border shadow-lg p-3 text-white rounded-lg">
@@ -270,7 +297,7 @@ return (
           className="w-7/12 border rounded-lg"
         />
         <span>
-          <p className='font-bold'>
+          <p className="font-bold">
             Photographer:
             <span>
               <em>{view.photographer}</em>
@@ -279,7 +306,7 @@ return (
           <a href={view.url} className="text-blue-500 text-sm hover:underline">
             Photographed Profile
           </a>
-          <p>{viewerRating}</p>
+          <button onClick={()=>deleteViewed(view.id)}>X</button>
         </span>
       </div>
     ))}
