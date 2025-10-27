@@ -9,7 +9,10 @@ export default function App(){
   const [query, setQuery] = useState("")
   const [images, setImages] =useState([])
   const [selected, setSelected] = useState(null)
-  const [viewed, setViewed] = useState([])
+  const [viewed, setViewed] = useState(function(){
+   const storedValue =localStorage.getItem("viewed");
+    return JSON.parse(storedValue)
+  })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
@@ -58,7 +61,10 @@ export default function App(){
     setViewed((viewed)=>[
       ...viewed, image
     ])
-    }
+   }
+    useEffect(function(){
+ localStorage.setItem("viewed", JSON.stringify(viewed))}, [viewed])
+    
 //function deleteViewed(id) {
   //setViewed(viewed.filter((view) => view.id !== id));
 //}
@@ -251,7 +257,7 @@ useEffect(
             <span className="font-bold">Photographer:</span>{" "}
             {images.photographer}
           </p>
-          { addToList &&
+          { addToList && 
             <button onClick={handleAddList}>Add to List</button>
                }
         </>
