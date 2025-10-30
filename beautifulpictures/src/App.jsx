@@ -130,7 +130,7 @@ function Loading(){
   }
   return(
     <div>
-     <button onClick={handleOpen}>{open ? "-" : "+"}</button>
+     <button onClick={handleOpen} class="text-white text-[25px] font-bold">{open ? "-" : "+"}</button>
      {open && element}
     </div>
   )
@@ -142,19 +142,19 @@ function Loading(){
   }
   return (
     <div>
-      <button onClick={handleOpen}>{open ? "-" : "+"}</button>
+      <button onClick={handleOpen} class="text-white text-[25px] font-bold">{open ? "-" : "+"}</button>
       {open && element2}
     </div>
   );
  }
 function Form({query, setQuery, images}){
   return (
-    <div className="bg-purple-700 p-3 mr-2 ml-2 border rounded-lg">
+    <div className="bg-purple-700 p-3 mr-2 ml-2 border-[10px] rounded-lg">
       <form className="flex gap-4 justify-center">
         <input
           type="text"
           placeholder="...Search Photo"
-          className="bg-purple-400 p-2 text-white border rounded-lg w-7/12 md:w-7/12"
+          className="bg-purple-400 p-2 text-white border-[2px] rounded-lg w-7/12 md:w-7/12"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -257,29 +257,35 @@ useEffect(
             <span className="font-bold">Photographer:</span>{" "}
             {images.photographer}
           </p>
-          { addToList && 
-            <button onClick={handleAddList}>Add to List</button>
-               }
+          {addToList && (
+            <button
+              onClick={handleAddList}
+              class="border-b-2 rounded-lg bg-white mt-2 mb-2 ml-2  hover:border-blue-500 "
+            >
+              Add to List
+            </button>
+          )}
         </>
       </span>
       {selected && (
         <div className="w-fit flex flex- space-y-2">
-          { !alreadyViewed ? ( Array.from({ length: 5 }, (_, i) => (
-            <StarRating
-              key={i}
-              full={temp ? temp >= i + 1 : rating >= 1 + i}
-              onRating={() => handleRating(i + 1)}
-              onHoverEnter={() => setTemp(i + 1)}
-              onHoverLeave={() => setTemp(0)}
-              temp={temp}
-              rating={rating}
-              viewerRating={viewerRating}
-              setViewerRating={setViewerRating}
-            />
-          ))):(
-           <p> You rated this Pic and rated this image {alreadyRated} </p>
-          )
-        }
+          {!alreadyViewed ? (
+            Array.from({ length: 5 }, (_, i) => (
+              <StarRating
+                key={i}
+                full={temp ? temp >= i + 1 : rating >= 1 + i}
+                onRating={() => handleRating(i + 1)}
+                onHoverEnter={() => setTemp(i + 1)}
+                onHoverLeave={() => setTemp(0)}
+                temp={temp}
+                rating={rating}
+                viewerRating={viewerRating}
+                setViewerRating={setViewerRating}
+              />
+            ))
+          ) : (
+            <p> You rated this Pic and rated this image {alreadyRated} </p>
+          )}
           <p className="text-lg">{temp || rating || ""}</p>
         </div>
       )}
@@ -292,7 +298,7 @@ function ImagesViewed({viewed, setViewed}){
   }
 return (
   <div>
-    <div className="bg-[#1e293b] border shadow-lg p-3 text-white rounded-lg">
+    <div className="bg-[#1e293b] border-[3px] shadow-lg p-3 text-white rounded-lg">
       Images Seen and Rated : {viewed.length}
     </div>
     {viewed.map((view) => (
@@ -309,11 +315,12 @@ return (
               <em>{view.photographer}</em>
             </span>
           </p>
+          
           <a href={view.url} className="text-blue-500 text-sm hover:underline">
             Photographed Profile
-          </a>
-          <button onClick={()=>deleteViewed(view.id)}>X</button>
-        </span>
+          </a> <br/>
+ <button onClick={()=>deleteViewed(view.id)} class="text-[10px] text-red-600 ml-3">Remove</button>
+ </span>
       </div>
     ))}
   </div>
